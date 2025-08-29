@@ -185,6 +185,11 @@
           <td>
             <%= user.email %>
           </td>
+          <td>
+            <form action="/users/<%= user.id %>/edit" method="GET">
+              <button>Edit</button>
+            </form>
+          </td>
         </tr>
         <% } %>
     </table>

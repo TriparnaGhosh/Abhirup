@@ -3,7 +3,9 @@ const mysql = require("mysql2");
 const express = require("express");
 const app = express();
 const path = require("path");
+const methodOverride = require("method-override");
 
+app.use(methodOverride("_method"));
 app.set("view engine","ejs");
 app.set("views", path.join(__dirname,"views"));
 
@@ -28,7 +30,7 @@ let getRandomUser = () => [
 ];
 
 
-app.get("/home ", (req,res) => {
+app.get("/home", (req,res) => {
     let q = 'SELECT count(*) FROM user';
 
     try { 
@@ -92,7 +94,45 @@ app.get("/users/search", (req,res) => {
         console.log(err); 
         res.send("Some error in DB");
     };
-})
+});
+
+app.get("/users/:id/edit" ,(req,res) => {
+    let { id }= req.params;
+    let q = `SELECT * FROM USER WHERE id = "${id}"`;
+
+    try { 
+    connection.query(q,(err, result) => {
+        if(err) throw err;
+        let user = result[0];
+        res.render("edit.ejs",{ user });
+    }); 
+    } catch (err) { 
+        console.log(err); 
+        res.send("Some error in DB");
+    };
+});
+
+app.patch("/users/:id", (req, res) => {
+    let { id } = req.params;
+    let { username: newUsername, password: formPass } = req.body;
+
+    let q = `SELECT * FROM user WHERE id = ?`;
+    connection.query(q, [id], (err, result) => {
+        if (err) throw err;
+        let user = result[0];
+
+        if (formPass !== user.password) {
+            res.send("Wrong Password ❌");
+        } else {
+            let q2 = `UPDATE user SET username = ? WHERE id = ?`;
+            connection.query(q2, [newUsername, id], (err, result) => {
+                if (err) throw err;
+                res.redirect("/users");
+            });
+        }
+    });
+});
+
 
 app.listen("8080",()=>{
     console.log("Listening to port 8080");
