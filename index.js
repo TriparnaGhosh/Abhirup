@@ -28,7 +28,7 @@ let getRandomUser = () => [
 ];
 
 
-app.get("/", (req,res) => {
+app.get("/home ", (req,res) => {
     let q = 'SELECT count(*) FROM user';
 
     try { 
