@@ -133,6 +133,16 @@ app.patch("/users/:id", (req, res) => {
     });
 });
 
+app.delete("/users/:id", (req, res) => {
+    let { id } = req.params;
+
+    let q = `DELETE FROM user WHERE id = ?`;
+    connection.query(q, [id], (err, result) => {
+        if (err) throw err;
+        res.redirect("/users");
+    });
+});
+
 
 app.listen("8080",()=>{
     console.log("Listening to port 8080");
